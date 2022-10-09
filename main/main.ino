@@ -284,7 +284,6 @@ void loop() {
     if (servo_clock >= SERVOS_ACTIVATION_DELAY) {   // activation delay over
         
         servos_active = true;   // activate servo movement
-        servo_clock = 0;        // reset clock
 
     }
 
