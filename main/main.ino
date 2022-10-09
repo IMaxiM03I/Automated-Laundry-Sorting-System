@@ -185,8 +185,9 @@ String object_type = WHITE;
 
 // servos
 
-bool servos_active = false;     // true if servos should be moving
-int servo_clock = 0;            // clock that keeps track of last time servos were active
+bool servos_active = false;                 // true if servos should be moving
+int servo_deactivation_time = millis();     // store the last time the servos were deactivated
+int servo_clock = 0;                        // clock that keeps track of last time servos were active
 
 
 
@@ -272,12 +273,13 @@ void loop() {
         else if (object_type == COLOR) { move_servo(COLOR_SERVO); } 
         else if (object_type == BLACK) { move_servo(BLACK_SERVO); }
 
-        servos_active = false;      // reset
+        servos_active = false;                  // reset
+        servo_deactivation_time = millis();     // reset
     
     }
 
     // tick servo clock
-    servo_clock++;      // tick
+    servo_clock == servo_deactivation_time - millis();      // tick
     
     if (servo_clock == SERVOS_ACTIVATION_DELAY) {   // activation delay over
         
