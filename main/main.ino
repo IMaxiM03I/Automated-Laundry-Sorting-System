@@ -281,7 +281,7 @@ void loop() {
     // tick servo clock
     servo_clock == servo_deactivation_time - millis();      // tick
     
-    if (servo_clock == SERVOS_ACTIVATION_DELAY) {   // activation delay over
+    if (servo_clock >= SERVOS_ACTIVATION_DELAY) {   // activation delay over
         
         servos_active = true;   // activate servo movement
         servo_clock = 0;        // reset clock
