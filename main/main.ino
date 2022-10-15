@@ -82,7 +82,7 @@ Servo WHITE_SERVO;                      // servo that will push the item onto wh
 Servo BLACK_SERVO;                      // servo that will push the item onto black basket
 Servo COLOR_SERVO;                      // servo that will push the item onto color basket
  
-int SERVO_POSITION_UPDATE_DELAY = 5;    // waits 15ms for the servo to reach the position
+int SERVO_POSITION_UPDATE_DELAY = 15;    // waits 15ms for the servo to reach the position
 int SERVO_MOVEMENT_SPEEED = 10;         // delta(angle) per iteration of loop
 
 int SERVOS_RESET_DELAY = 5000 * 3;          // reset servos position 5s after plate was tilted
@@ -210,21 +210,9 @@ void reset_servos(String origin) {
 
 void tilt_main_plate(String color) {
 
-    Serial.print("tilting main plate to ");
-
-    if (color == WHITE) {
-        Serial.print(WHITE);
-        Serial.println("...");
-        tilt_white();
-    } else if (color == BLACK) {
-        Serial.print(BLACK);
-        Serial.println("...");
-        tilt_black();
-    } else {
-        Serial.print(COLOR);
-        Serial.println("...");
-        tilt_color();
-    }
+    if (color == WHITE) { tilt_white();
+    } else if (color == BLACK) { tilt_black();
+    } else { tilt_color(); }
 
     Serial.println("main plate tilted!");
 
@@ -232,6 +220,8 @@ void tilt_main_plate(String color) {
 
 
 void tilt_white() {
+
+    Serial.println("tilting main plate to white...");
 
     for (int angle = 0; angle < 180; angle += SERVO_MOVEMENT_SPEEED) {
         move_servo(BLACK_SERVO, angle);
@@ -243,15 +233,23 @@ void tilt_white() {
 
 void tilt_black() {
 
+    Serial.println("tilting main plate to black...");
+
     for (int angle = 0; angle < 180; angle += SERVO_MOVEMENT_SPEEED) {
         move_servo(WHITE_SERVO, angle);
         move_servo(COLOR_SERVO, angle);
+        // WHITE_SERVO.write(angle);
+        // delay(SERVO_POSITION_UPDATE_DELAY);
+        // COLOR_SERVO.write(angle);
+        // delay(SERVO_POSITION_UPDATE_DELAY);
     }
 
 }
 
 
 void tilt_color() {
+
+    Serial.println("tilting main plate to color...");
 
     for (int angle = 0; angle < 180; angle += SERVO_MOVEMENT_SPEEED) {
         move_servo(WHITE_SERVO, angle);
