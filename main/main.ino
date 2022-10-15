@@ -8,11 +8,11 @@
  
 // color sensor
  
-int S0 = 4;     // scale output frequency
-int S1 = 5;     // scale output frequency
-int S2 = 6;     // set photodiode type
-int S3 = 7;     // set photodiode type
-int SENSOR_OUT = 8;     // sensor output / arduino input
+#define S0 4             // scale output frequency
+#define S1 5             // scale output frequency
+#define S2 6             // set photodiode type
+#define S3 7             // set photodiode type
+#define SENSOR_OUT 8     // sensor output / arduino input
  
 /*
  
@@ -74,7 +74,7 @@ String COLOR = "color";
 
 // COLOR SENSOR //
 
-int COLOR_DETECTION_DELAY = 5000;       // detect color 5s after servos were reset
+int COLOR_DETECTION_DELAY = 5000 * 3;       // detect color 5s after servos were reset
  
 // SERVOS //
  
@@ -85,7 +85,7 @@ Servo COLOR_SERVO;                      // servo that will push the item onto co
 int SERVO_POSITION_UPDATE_DELAY = 5;    // waits 15ms for the servo to reach the position
 int SERVO_MOVEMENT_SPEEED = 10;         // delta(angle) per iteration of loop
 
-int SERVOS_RESET_DELAY = 5000;          // reset servos position 5s after plate was tilted
+int SERVOS_RESET_DELAY = 5000 * 3;          // reset servos position 5s after plate was tilted
  
  
  
@@ -203,7 +203,7 @@ void reset_servos(String origin) {
         move_servo(servo2, angle);
     }
 
-    Serial.println("servos reset!");
+    Serial.println("servos reset!\n\n");
 
 }
 
@@ -211,14 +211,18 @@ void reset_servos(String origin) {
 void tilt_main_plate(String color) {
 
     Serial.print("tilting main plate to ");
-    Serial.print(color);
-    Serial.println("...");
 
     if (color == WHITE) {
+        Serial.print(WHITE);
+        Serial.println("...");
         tilt_white();
     } else if (color == BLACK) {
+        Serial.print(BLACK);
+        Serial.println("...");
         tilt_black();
     } else {
+        Serial.print(COLOR);
+        Serial.println("...");
         tilt_color();
     }
 
@@ -280,11 +284,11 @@ bool ready_to_detect_color = true;
 // servos
  
 bool ready_to_tilt = false;                 // true if servos should be moving
-int servo_tilt_time_stamp = millis();       // store the last time the servos tilted the main plate
+unsigned long servo_tilt_time_stamp = millis();       // store the last time the servos tilted the main plate
 
 bool ready_to_reset = false;                // true if servos should return to standby position
 bool servos_in_standby = true;              // true if servos are in their standby position
-int servo_reset_time_stamp = millis();      // store the last time the servos were reset
+unsigned long servo_reset_time_stamp = millis();      // store the last time the servos were reset
  
  
  
@@ -321,7 +325,7 @@ void setup() {
     move_servo(COLOR_SERVO, 0);
 
     delay(1000);
-    Serial.println("Arduino ready!");
+    Serial.println("Arduino ready!\n\n\n");
  
 }
  
@@ -333,6 +337,18 @@ void setup() {
 void loop() {
  
     // --- COLOR SENSOR UPDATE --- //
+
+    // color sensor clock
+
+    if (servos_in_standby && (millis() - servo_reset_time_stamp >= COLOR_DETECTION_DELAY)) {
+        ready_to_detect_color = true;
+        Serial.print("ready to detect color");
+        Serial.print(" after: ");
+        Serial.print(millis() - servo_reset_time_stamp);
+        Serial.println(" milliseconds");
+        // Serial.print(" since last servo reset at: ");
+        // Serial.println(servo_reset_time_stamp);
+    }
 
     // color detection
 
@@ -378,13 +394,6 @@ void loop() {
         Serial.println("ready to tilt");
     
     }
-
-    // color sensor clock
-
-    if (servos_in_standby && millis() - servo_reset_time_stamp >= COLOR_DETECTION_DELAY) {
-        ready_to_detect_color = true;
-        Serial.println("ready to detect color");
-    }
  
  
  
@@ -410,9 +419,14 @@ void loop() {
 
     // servos clock
 
-    if (!servos_in_standby && millis() - servo_tilt_time_stamp >= SERVOS_RESET_DELAY) { 
+    if (!servos_in_standby && (millis() - servo_tilt_time_stamp >= SERVOS_RESET_DELAY)) { 
         ready_to_reset = true;
-        Serial.println("ready to reset");
+        Serial.print("ready to reset");
+        Serial.print(" after: ");
+        Serial.print(millis() - servo_tilt_time_stamp);
+        Serial.println(" milliseconds");
+        // Serial.print(" since last servo reset at: ");
+        // Serial.println(servo_reset_time_stamp);
     }
  
 }
